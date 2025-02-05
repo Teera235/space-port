@@ -1,0 +1,60 @@
+#include <SPI.h>
+#include <SD.h>
+
+File myFile;
+
+void setup() {
+  Serial.begin(9600);
+  
+  while (!Serial) {
+    ;
+  }
+
+  Serial.print("Initializing SD card Systen...");
+  if (!SD.begin(SS)) {
+    Serial.println("initialization SD card Systen failed!");
+    while (1);
+  }
+  Serial.println("initialization SD card Systen done.");
+
+  //ลบไฟล์ก่อนหน้า
+  if (SD.exists("STA.csv")) {
+    SD.remove("STA.csv");
+    Serial.println("STA.csv has been deleted.");
+  } else {
+    Serial.println("STA.csv does not exist.");
+  }
+// สร้างไฟล
+  myFile = SD.open("STA.csv", FILE_WRITE);
+  if (myFile) {
+    Serial.print("Writing to STA.csv...");
+    myFile.print("aX(Degree),aY(Degree),aZ(Degree)\n");  
+    myFile.print("data1,data2,data3\n");  //  1
+    myFile.close();
+    Serial.println("done.");
+  } else {
+    Serial.println("error opening STA.csv");
+  }
+
+  // เปิดไฟล์
+  myFile = SD.open("STA.csv");
+  if (myFile) {
+    Serial.println("STA.csv:");
+    Serial.println("------------------------");
+    while (myFile.available()) {
+      char c = myFile.read();
+      if (c == ',') {
+        Serial.print(" | ");
+      } else {
+        Serial.print(c);
+      }
+    }
+    myFile.close();
+    Serial.println("\n------------------------");
+  } else {
+    Serial.println("error opening STA.csv");
+  }
+}
+
+void loop() {
+}
